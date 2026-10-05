@@ -31,7 +31,7 @@
         '<span>' + (resolved ? (item.type === 'lost' ? '已找到 · ' : '已归还 · ') : '进行中 · ') +
         '发布于 ' + App.fmtTime(item.createdAt) + '</span></div>' +
       '<div class="main">' +
-        '<div class="big-icon">' + App.catIcon(item.category) + '</div>' +
+        '<div class="big-icon">' + (item.icon || App.catIcon(item.category)) + '</div>' +
         '<div><h2>' + App.escapeHtml(item.title) + '</h2>' +
         '<div class="sub">' + App.escapeHtml(item.description ? item.description.slice(0, 24) : '暂无描述') + '…</div></div>' +
       '</div>' +

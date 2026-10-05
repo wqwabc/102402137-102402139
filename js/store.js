@@ -158,6 +158,7 @@
         contactQq: qq,
         contactWechat: wechat,
         photo: (r.photo || ''),
+        icon: (r.icon || ''),
         publisher: CURRENT_USER_ID,
         status: 'active',
         createdAt: Date.now(),

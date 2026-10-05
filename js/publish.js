@@ -33,6 +33,25 @@
     catBox.querySelectorAll('.cat-chip').forEach(function (c) { c.classList.remove('active'); });
     chip.classList.add('active');
     state.category = chip.getAttribute('data-c');
+    chosenIcon = App.catIcon(state.category);   // 选分类时默认带对应图标
+    renderIconPicker();
+  });
+
+  // ---------- 物品图标选择（可不选，默认随分类） ----------
+  var ITEM_ICONS = ['🥤', '🪪', '🎧', '🌂', '🎒', '👓', '📚', '📱', '💻', '⌚', '🔑', '💰', '⚽', '🧸', '👟', '🧥'];
+  var chosenIcon = '';
+  var iconBox = document.getElementById('f_icon');
+  function renderIconPicker() {
+    iconBox.innerHTML = ITEM_ICONS.map(function (ic) {
+      return '<span class="av' + (ic === chosenIcon ? ' active' : '') + '" data-ic="' + ic + '">' + ic + '</span>';
+    }).join('');
+  }
+  renderIconPicker();
+  iconBox.addEventListener('click', function (e) {
+    var el = e.target.closest('.av');
+    if (!el) return;
+    chosenIcon = el.getAttribute('data-ic');
+    renderIconPicker();
   });
 
   // ---------- 照片上传（FileReader + canvas 压缩为 base64） ----------
@@ -97,7 +116,8 @@
       contactPhone: document.getElementById('f_phone').value,
       contactQq: document.getElementById('f_qq').value,
       contactWechat: document.getElementById('f_wechat').value,
-      photo: pendingPhoto
+      photo: pendingPhoto,
+      icon: chosenIcon
     };
     var res = Store.add(raw);
     if (!res.ok) { showErrors(res.errors); return; }
@@ -136,6 +156,7 @@
     });
     state.category = '';
     catBox.querySelectorAll('.cat-chip').forEach(function (c) { c.classList.remove('active'); });
+    chosenIcon = ''; renderIconPicker();
     document.getElementById('errBox').classList.remove('show');
     // 清空照片
     pendingPhoto = ''; photoInput.value = '';
