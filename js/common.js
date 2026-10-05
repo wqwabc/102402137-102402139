@@ -56,7 +56,9 @@
       (from ? '&from=' + encodeURIComponent(from) : '');
     return '' +
       '<a class="card" href="' + href + '">' +
-        '<div class="card-icon cat-' + escapeHtml(item.category) + '">' + catIcon(item.category) + '</div>' +
+        '<div class="card-icon cat-' + escapeHtml(item.category) + '">' +
+          (item.photo ? '<img class="cat-img" src="' + item.photo + '" alt="物品照片">' : catIcon(item.category)) +
+        '</div>' +
         '<div class="card-body">' +
           '<div class="card-title-row">' + typeBadge(item) +
             '<span class="card-title">' + escapeHtml(item.title) + '</span>' +

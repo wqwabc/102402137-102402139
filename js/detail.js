@@ -49,6 +49,10 @@
       '<div class="desc-text">' + App.escapeHtml(item.description || '（发布者未填写描述）') + '</div>' +
     '</div>' +
 
+    (item.photo
+      ? '<div class="section"><h3>📷 物品照片</h3><img class="detail-photo" src="' + item.photo + '" alt="物品照片"></div>'
+      : '') +
+
     '<div class="section"><h3>👤 发布者</h3>' +
       '<div class="publisher">' +
         '<div class="avatar">' + App.escapeHtml(item.contactName.charAt(0).toUpperCase()) + '</div>' +

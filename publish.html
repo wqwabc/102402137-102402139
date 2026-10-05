@@ -54,6 +54,21 @@
           <label>详细描述 <span style="font-weight:400;color:var(--text-2);font-size:12px;">（选填，0/200）</span></label>
           <textarea id="f_desc" maxlength="200" placeholder="描述物品的颜色、特征、内含物等，便于同学快速辨认"></textarea>
         </div>
+        <div class="form-group">
+          <label>物品照片 <span style="font-weight:400;color:var(--text-2);font-size:12px;">（选填，可上传一张）</span></label>
+          <input type="file" id="f_photo" accept="image/*" hidden>
+          <div class="photo-upload" id="photoBox">
+            <div id="photoPreview" style="display:none;">
+              <img id="previewImg" alt="物品照片">
+              <div class="photo-actions">
+                <button type="button" id="photoRemove" class="btn small danger">删除照片</button>
+              </div>
+            </div>
+            <div id="photoPlaceholder" class="ph-inner">
+              <span class="ph-icon">📷</span><span>点击上传照片</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="section">

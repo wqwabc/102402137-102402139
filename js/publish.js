@@ -35,6 +35,47 @@
     state.category = chip.getAttribute('data-c');
   });
 
+  // ---------- 照片上传（FileReader + canvas 压缩为 base64） ----------
+  var pendingPhoto = '';
+  var photoInput = document.getElementById('f_photo');
+  var photoBox = document.getElementById('photoBox');
+
+  function readAndCompress(file, cb) {
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var img = new Image();
+      img.onload = function () {
+        var MAX = 480, w = img.width, h = img.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        cb(c.toDataURL('image/jpeg', 0.72));
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+  photoBox.addEventListener('click', function (e) {
+    if (e.target.closest('#photoRemove')) return;
+    photoInput.click();
+  });
+  photoInput.addEventListener('change', function () {
+    var file = photoInput.files && photoInput.files[0];
+    if (!file) return;
+    readAndCompress(file, function (dataUrl) {
+      pendingPhoto = dataUrl;
+      document.getElementById('previewImg').src = dataUrl;
+      document.getElementById('photoPreview').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    });
+  });
+  document.getElementById('photoRemove').addEventListener('click', function () {
+    pendingPhoto = ''; photoInput.value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoPlaceholder').style.display = '';
+  });
+
   function showErrors(errors) {
     var box = document.getElementById('errBox');
     box.querySelector('ul').innerHTML = errors.map(function (e) { return '<li>· ' + App.escapeHtml(e) + '</li>'; }).join('');
@@ -55,7 +96,8 @@
       contactName: document.getElementById('f_name').value,
       contactPhone: document.getElementById('f_phone').value,
       contactQq: document.getElementById('f_qq').value,
-      contactWechat: document.getElementById('f_wechat').value
+      contactWechat: document.getElementById('f_wechat').value,
+      photo: pendingPhoto
     };
     var res = Store.add(raw);
     if (!res.ok) { showErrors(res.errors); return; }
@@ -95,6 +137,10 @@
     state.category = '';
     catBox.querySelectorAll('.cat-chip').forEach(function (c) { c.classList.remove('active'); });
     document.getElementById('errBox').classList.remove('show');
+    // 清空照片
+    pendingPhoto = ''; photoInput.value = '';
+    document.getElementById('photoPreview').style.display = 'none';
+    document.getElementById('photoPlaceholder').style.display = '';
   }
 
   // 用个人信息预填联系人/联系方式

@@ -157,6 +157,7 @@
         contactPhone: phone,
         contactQq: qq,
         contactWechat: wechat,
+        photo: (r.photo || ''),
         publisher: CURRENT_USER_ID,
         status: 'active',
         createdAt: Date.now(),
