@@ -17,6 +17,7 @@
   var locLabel = item.type === 'lost' ? '丢失地点' : '拾取地点';
   var timeLabel = item.type === 'lost' ? '丢失时间' : '拾取时间';
   var resolved = item.status === 'resolved';
+  var isOwner = (item.publisher === Store.CURRENT_USER_ID);
 
   root.innerHTML =
     '<div class="detail-hero ' + heroClass + '">' +
@@ -46,7 +47,7 @@
       '<div class="publisher">' +
         '<div class="avatar">' + App.escapeHtml(item.contactName.charAt(0).toUpperCase()) + '</div>' +
         '<div class="info"><div class="n">' + App.escapeHtml(item.contactName) + '</div>' +
-        '<div class="d">发布者标识：' + App.escapeHtml(item.publisher) + '</div></div>' +
+        '<div class="d">学号：' + App.escapeHtml(item.publisher) + '</div></div>' +
       '</div>' +
     '</div>' +
 
@@ -54,11 +55,9 @@
       '<div id="contactArea"></div>' +
     '</div>' +
 
-    '<div class="section"><h3>🛠️ 我是发布者</h3>' +
-      '<div class="form-group"><input type="text" id="checkPub" placeholder="输入你发布时填的学号/昵称"></div>' +
-      '<button class="btn small" id="checkBtn">校验身份并管理</button>' +
-      '<div id="pubManage" style="display:none;margin-top:10px;"></div>' +
-    '</div>';
+    (isOwner
+      ? '<div class="section"><h3>🛠️ 发布者管理</h3><div id="ownerBtns"></div></div>'
+      : '');
 
   function row(k, v) {
     return '<div class="row"><span class="k">' + k + '</span><span class="v">' + App.escapeHtml(v || '—') + '</span></div>';
@@ -92,14 +91,11 @@
   }
   renderContactHidden();
 
-  // 发布者身份校验 + 状态管理
-  document.getElementById('checkBtn').addEventListener('click', function () {
-    var who = document.getElementById('checkPub').value.trim();
-    if (who !== item.publisher) { App.toast('标识不匹配，无法管理这条信息'); return; }
-    var box = document.getElementById('pubManage');
-    box.style.display = 'block';
+  // 发布者管理：已登录且为本人时，直接显示状态维护按钮，无需再核对学号
+  if (isOwner) {
+    var ownerBtns = document.getElementById('ownerBtns');
     var doneLabel = item.type === 'lost' ? '标记为已找到' : '标记为已归还';
-    box.innerHTML =
+    ownerBtns.innerHTML =
       (resolved
         ? '<button class="btn small" id="reopenBtn">↩ 重新标记为进行中</button>'
         : '<button class="btn small" id="doneBtn">✔ ' + doneLabel + '</button>') +
@@ -119,5 +115,5 @@
         setTimeout(function () { location.href = 'my.html'; }, 700);
       }
     });
-  });
+  }
 })();

@@ -55,8 +55,7 @@
       contactName: document.getElementById('f_name').value,
       contactPhone: document.getElementById('f_phone').value,
       contactQq: document.getElementById('f_qq').value,
-      contactWechat: document.getElementById('f_wechat').value,
-      publisher: document.getElementById('f_publisher').value
+      contactWechat: document.getElementById('f_wechat').value
     };
     var res = Store.add(raw);
     if (!res.ok) { showErrors(res.errors); return; }
@@ -90,7 +89,7 @@
   });
 
   function resetForm() {
-    ['f_title', 'f_location', 'f_date', 'f_time', 'f_desc', 'f_name', 'f_phone', 'f_qq', 'f_wechat', 'f_publisher'].forEach(function (id) {
+    ['f_title', 'f_location', 'f_date', 'f_time', 'f_desc', 'f_name', 'f_phone', 'f_qq', 'f_wechat'].forEach(function (id) {
       document.getElementById(id).value = '';
     });
     state.category = '';

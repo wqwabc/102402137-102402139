@@ -1,29 +1,14 @@
-/* my.js —— 我的发布：输入发布者标识后查看并管理自己的信息 */
+/* my.js —— 我的发布：默认已登录，直接查看并管理当前用户的信息 */
 (function () {
   'use strict';
   App.setActiveNav('my');
 
-  var who = '';
+  // 默认已登录：当前用户即发布者，直接展示，无需输入学号
+  var who = Store.CURRENT_USER_ID;
   var tab = 'all';
 
-  var whoInput = document.getElementById('whoInput');
-  // 记住上次输入的发布者标识
-  whoInput.value = localStorage.getItem('my_publisher') || '';
-
-  function enter() {
-    who = whoInput.value.trim();
-    if (!who) { App.toast('请先输入你的发布者标识'); return; }
-    localStorage.setItem('my_publisher', who);
-    document.getElementById('identifyBox').style.display = 'none';
-    document.getElementById('profileBox').style.display = '';
-    document.getElementById('myArea').style.display = '';
-    document.getElementById('pName').textContent = who;
-    document.getElementById('pAvatar').textContent = who.charAt(0).toUpperCase();
-    render();
-  }
-
-  document.getElementById('whoBtn').addEventListener('click', enter);
-  whoInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') enter(); });
+  document.getElementById('pName').textContent = who;
+  document.getElementById('pAvatar').textContent = who.charAt(0).toUpperCase();
 
   document.querySelectorAll('.tabs .tab').forEach(function (t) {
     t.addEventListener('click', function () {
@@ -49,4 +34,6 @@
     }
     listEl.innerHTML = items.map(App.cardHtml).join('');
   }
+
+  render();
 })();

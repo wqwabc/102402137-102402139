@@ -13,6 +13,10 @@
   // 信息类型：lost=寻物启事（我丢了东西），found=失物招领（我捡到东西）
   var TYPES = { lost: '寻物', found: '招领' };
 
+  // 当前登录用户：雏形阶段默认已登录，固定为本机同学的学号。
+  // 发布时自动署名，不再让用户手动填写“发布者标识”。
+  var CURRENT_USER_ID = '102402137';
+
   function pad(n) { return String(n).padStart(2, '0'); }
 
   // 生成信息编号，形如 LF20260927018
@@ -133,7 +137,6 @@
     if (!phone && !qq && !wechat) errors.push('请至少填写一种联系方式（电话/QQ/微信）');
     if (phone && !/^1[3-9]\d{9}$/.test(phone)) errors.push('联系电话应为11位大陆手机号');
     if (qq && !/^\d{5,12}$/.test(qq)) errors.push('QQ号应为5-12位数字');
-    if (!publisher) errors.push('请填写发布者标识（学号/昵称），用于在“我的发布”中管理');
 
     if (errors.length) return { ok: false, errors: errors, item: null };
 
@@ -153,7 +156,7 @@
         contactPhone: phone,
         contactQq: qq,
         contactWechat: wechat,
-        publisher: publisher,
+        publisher: CURRENT_USER_ID,
         status: 'active',
         createdAt: Date.now(),
         views: 0
@@ -260,6 +263,7 @@
   var Store = {
     CATEGORIES: CATEGORIES,
     TYPES: TYPES,
+    CURRENT_USER_ID: CURRENT_USER_ID,
     getAll: getAll,
     validate: validate,
     add: add,

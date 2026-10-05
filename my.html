@@ -10,18 +10,8 @@
   <div class="app">
     <div class="page-title">我的</div>
 
-    <!-- 身份输入 -->
-    <div class="section" id="identifyBox">
-      <h3>🔑 查看我的发布</h3>
-      <div class="form-group" style="margin-bottom:0;">
-        <input type="text" id="whoInput" placeholder="输入你发布时填的学号/昵称，如：102402137">
-        <div class="hint">本系统不做实名认证，用它找回你发布过的信息并维护状态。</div>
-      </div>
-      <button class="btn small" id="whoBtn" style="margin-top:12px;">查看我的发布</button>
-    </div>
-
-    <!-- 身份卡片 -->
-    <div class="profile" id="profileBox" style="display:none;">
+    <!-- 身份卡片（默认已登录） -->
+    <div class="profile" id="profileBox">
       <div class="who">
         <div class="avatar" id="pAvatar">我</div>
         <div><div class="n" id="pName"></div><div class="d">东湖校区</div></div>
@@ -32,7 +22,7 @@
       </div>
     </div>
 
-    <div id="myArea" style="display:none;">
+    <div id="myArea">
       <div class="myhead">
         <h3>我的发布</h3>
         <a class="add" href="publish.html">+ 发布新信息</a>
