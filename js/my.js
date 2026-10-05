@@ -7,8 +7,61 @@
   var who = Store.CURRENT_USER_ID;
   var tab = 'all';
 
-  document.getElementById('pName').textContent = who;
-  document.getElementById('pAvatar').textContent = who.charAt(0).toUpperCase();
+  var AVATARS = ['🐱', '🐶', '📚', '🎧', '⚽', '🚀', '🐼', '🌟', '🍀', '🎮'];
+  var chosenAvatar = Store.getProfile().avatar;
+
+  function renderProfile() {
+    var prof = Store.getProfile();
+    document.getElementById('pName').textContent = prof.name;
+    document.getElementById('pCollege').textContent = prof.college + ' · ' + prof.campus;
+    document.getElementById('pAvatar').textContent = prof.avatar;
+  }
+  renderProfile();
+
+  function renderAvatarPicker() {
+    var box = document.getElementById('pf_avatar');
+    box.innerHTML = AVATARS.map(function (a) {
+      return '<span class="av' + (a === chosenAvatar ? ' active' : '') + '" data-a="' + a + '">' + a + '</span>';
+    }).join('');
+    box.querySelectorAll('.av').forEach(function (el) {
+      el.addEventListener('click', function () {
+        chosenAvatar = el.getAttribute('data-a');
+        box.querySelectorAll('.av').forEach(function (x) { x.classList.remove('active'); });
+        el.classList.add('active');
+      });
+    });
+  }
+
+  // 编辑个人信息
+  var mask = document.getElementById('editMask');
+  document.getElementById('editBtn').addEventListener('click', function () {
+    var prof = Store.getProfile();
+    chosenAvatar = prof.avatar;
+    document.getElementById('pf_name').value = prof.name;
+    document.getElementById('pf_college').value = prof.college;
+    document.getElementById('pf_campus').value = prof.campus;
+    document.getElementById('pf_phone').value = prof.phone;
+    document.getElementById('pf_wechat').value = prof.wechat;
+    document.getElementById('pf_qq').value = prof.qq;
+    renderAvatarPicker();
+    mask.style.display = 'flex';
+  });
+  document.getElementById('pfCancel').addEventListener('click', function () { mask.style.display = 'none'; });
+  mask.addEventListener('click', function (e) { if (e.target === mask) mask.style.display = 'none'; });
+  document.getElementById('pfSave').addEventListener('click', function () {
+    Store.saveProfile({
+      name: document.getElementById('pf_name').value,
+      college: document.getElementById('pf_college').value,
+      campus: document.getElementById('pf_campus').value,
+      avatar: chosenAvatar,
+      phone: document.getElementById('pf_phone').value,
+      wechat: document.getElementById('pf_wechat').value,
+      qq: document.getElementById('pf_qq').value
+    });
+    mask.style.display = 'none';
+    renderProfile();
+    App.toast('个人信息已保存');
+  });
 
   document.querySelectorAll('.tabs .tab').forEach(function (t) {
     t.addEventListener('click', function () {

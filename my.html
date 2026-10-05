@@ -14,11 +14,39 @@
     <div class="profile" id="profileBox">
       <div class="who">
         <div class="avatar" id="pAvatar">我</div>
-        <div><div class="n" id="pName"></div><div class="d">东湖校区</div></div>
+        <div style="flex:1;">
+          <div class="n" id="pName"></div>
+          <div class="d" id="pCollege"></div>
+        </div>
+        <button class="edit-btn" id="editBtn" title="编辑个人信息">✏️</button>
       </div>
       <div class="stats-row">
         <div class="cell"><div class="num" id="stTotal">0</div><div class="lab">我的发布</div></div>
         <div class="cell"><div class="num" id="stDone">0</div><div class="lab">已完成</div></div>
+      </div>
+    </div>
+
+    <!-- 编辑个人信息弹窗 -->
+    <div class="modal-mask" id="editMask">
+      <div class="modal">
+        <h3>编辑个人信息</h3>
+        <div class="form-group"><label>头像</label>
+          <div class="avatar-pick" id="pf_avatar"></div>
+        </div>
+        <div class="form-group"><label>昵称</label><input type="text" id="pf_name" maxlength="12" placeholder="给自己起个昵称"></div>
+        <div class="form-group"><label>学院</label><input type="text" id="pf_college" maxlength="20" placeholder="如：计算机学院"></div>
+        <div class="form-group"><label>校区</label>
+          <select id="pf_campus">
+            <option>东湖校区</option><option>旗山校区</option><option>铜盘校区</option><option>怡山校区</option>
+          </select>
+        </div>
+        <div class="form-group"><label>手机号</label><input type="tel" id="pf_phone" maxlength="11" placeholder="11位手机号"></div>
+        <div class="form-group"><label>微信（选填）</label><input type="text" id="pf_wechat" placeholder="选填"></div>
+        <div class="form-group"><label>QQ（选填）</label><input type="text" id="pf_qq" placeholder="选填"></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn ghost" id="pfCancel" style="flex:1;margin:8px 0;">取消</button>
+          <button class="btn" id="pfSave" style="flex:1;margin:8px 0;">保存</button>
+        </div>
       </div>
     </div>
 

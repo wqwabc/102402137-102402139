@@ -97,5 +97,14 @@
     document.getElementById('errBox').classList.remove('show');
   }
 
+  // 用个人信息预填联系人/联系方式
+  (function prefillContact() {
+    var prof = Store.getProfile();
+    document.getElementById('f_name').value = prof.name;
+    if (prof.phone) document.getElementById('f_phone').value = prof.phone;
+    if (prof.wechat) document.getElementById('f_wechat').value = prof.wechat;
+    if (prof.qq) document.getElementById('f_qq').value = prof.qq;
+  })();
+
   syncType();
 })();

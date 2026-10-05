@@ -7,6 +7,7 @@
   'use strict';
 
   var STORAGE_KEY = 'campus_lost_found_items_v1';
+  var PROFILE_KEY = 'campus_profile_v1';
 
   // 物品分类（下拉/胶囊按钮的固定取值，便于筛选与白盒测试）
   var CATEGORIES = ['证件卡', '数码电子', '生活用品', '雨具', '包袋', '随身物品', '图书资料', '其他'];
@@ -260,6 +261,32 @@
 
   function _reset() { save(seed()); }
 
+  // ---------- 个人信息（昵称 / 学院，可在“我的”页编辑） ----------
+  function getProfile() {
+    var def = {
+      name: '王小雨', college: '计算机学院', campus: '东湖校区',
+      avatar: '🐱', phone: '', wechat: '', qq: ''
+    };
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(PROFILE_KEY) : null;
+      if (raw) return Object.assign(def, JSON.parse(raw));
+    } catch (e) {}
+    return def;
+  }
+  function saveProfile(p) {
+    var prof = {
+      name: ((p.name || '').trim() || '未命名'),
+      college: ((p.college || '').trim() || '东湖校区'),
+      campus: ((p.campus || '').trim() || '东湖校区'),
+      avatar: (p.avatar || '🐱'),
+      phone: ((p.phone || '').trim()),
+      wechat: ((p.wechat || '').trim()),
+      qq: ((p.qq || '').trim())
+    };
+    if (global.localStorage) global.localStorage.setItem(PROFILE_KEY, JSON.stringify(prof));
+    return prof;
+  }
+
   var Store = {
     CATEGORIES: CATEGORIES,
     TYPES: TYPES,
@@ -274,6 +301,8 @@
     query: query,
     getByPublisher: getByPublisher,
     getStats: getStats,
+    getProfile: getProfile,
+    saveProfile: saveProfile,
     genCode: genCode,
     _seed: seed,
     _reset: _reset
