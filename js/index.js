@@ -26,7 +26,7 @@
       listEl.innerHTML = '<div class="empty"><div class="big">🗂️</div><p>没有找到相关信息<br>换个关键词或筛选条件试试</p></div>';
       return;
     }
-    listEl.innerHTML = items.map(App.cardHtml).join('');
+    listEl.innerHTML = items.map(function (it) { return App.cardHtml(it); }).join('');
   }
 
   function renderStats() {

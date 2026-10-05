@@ -50,9 +50,12 @@
   function catIcon(cat) { return CAT_ICON[cat] || '📦'; }
 
   // 渲染一条物品卡片（首页/搜索/我的列表通用）
-  function cardHtml(item) {
+  // from: 可选来源标记（'my' / 'search'），详情页据此决定“返回”跳回哪里
+  function cardHtml(item, from) {
+    var href = 'detail.html?id=' + encodeURIComponent(item.id) +
+      (from ? '&from=' + encodeURIComponent(from) : '');
     return '' +
-      '<a class="card" href="detail.html?id=' + encodeURIComponent(item.id) + '">' +
+      '<a class="card" href="' + href + '">' +
         '<div class="card-icon cat-' + escapeHtml(item.category) + '">' + catIcon(item.category) + '</div>' +
         '<div class="card-body">' +
           '<div class="card-title-row">' + typeBadge(item) +

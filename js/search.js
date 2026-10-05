@@ -27,7 +27,7 @@
       listEl.innerHTML = '<div class="empty"><div class="big">😕</div><p>未找到与“' + App.escapeHtml(state.keyword) + '”相关的信息<br>换个关键词试试，或去发布一条</p></div>';
       return;
     }
-    listEl.innerHTML = items.map(App.cardHtml).join('');
+    listEl.innerHTML = items.map(function (it) { return App.cardHtml(it, 'search'); }).join('');
   }
 
   function doSearch() {

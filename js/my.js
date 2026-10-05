@@ -32,7 +32,7 @@
       listEl.innerHTML = '<div class="empty"><div class="big">📭</div><p>这里还没有你发布的信息<br><a href="publish.html" style="color:var(--primary);font-weight:600;">去发布第一条</a></p></div>';
       return;
     }
-    listEl.innerHTML = items.map(App.cardHtml).join('');
+    listEl.innerHTML = items.map(function (it) { return App.cardHtml(it, 'my'); }).join('');
   }
 
   render();

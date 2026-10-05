@@ -13,6 +13,12 @@
   }
   Store.incrViews(id);
 
+  // “返回”按钮根据来源跳回：我的 -> my.html，搜索 -> search.html，否则首页
+  var from = App.qs('from');
+  var backHref = from === 'my' ? 'my.html' : (from === 'search' ? 'search.html' : 'index.html');
+  var backLink = document.querySelector('.topbar .back');
+  if (backLink) backLink.setAttribute('href', backHref);
+
   var heroClass = item.type === 'found' ? 'hero-found' : 'hero-lost';
   var locLabel = item.type === 'lost' ? '丢失地点' : '拾取地点';
   var timeLabel = item.type === 'lost' ? '丢失时间' : '拾取时间';
