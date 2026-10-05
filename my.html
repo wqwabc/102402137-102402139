@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的 - 校园失物招领</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="page-title">我的</div>
+
+    <!-- 身份输入 -->
+    <div class="section" id="identifyBox">
+      <h3>🔑 查看我的发布</h3>
+      <div class="form-group" style="margin-bottom:0;">
+        <input type="text" id="whoInput" placeholder="输入你发布时填的学号/昵称，如：102402137">
+        <div class="hint">本系统不做实名认证，用它找回你发布过的信息并维护状态。</div>
+      </div>
+      <button class="btn small" id="whoBtn" style="margin-top:12px;">查看我的发布</button>
+    </div>
+
+    <!-- 身份卡片 -->
+    <div class="profile" id="profileBox" style="display:none;">
+      <div class="who">
+        <div class="avatar" id="pAvatar">我</div>
+        <div><div class="n" id="pName"></div><div class="d">东湖校区</div></div>
+      </div>
+      <div class="stats-row">
+        <div class="cell"><div class="num" id="stTotal">0</div><div class="lab">我的发布</div></div>
+        <div class="cell"><div class="num" id="stDone">0</div><div class="lab">已完成</div></div>
+      </div>
+    </div>
+
+    <div id="myArea" style="display:none;">
+      <div class="myhead">
+        <h3>我的发布</h3>
+        <a class="add" href="publish.html">+ 发布新信息</a>
+      </div>
+      <div class="tabs">
+        <div class="tab active" data-type="all">全部</div>
+        <div class="tab" data-type="lost">寻物</div>
+        <div class="tab" data-type="found">招领</div>
+        <span class="count" id="count"></span>
+      </div>
+      <div class="list" id="myList"></div>
+    </div>
+
+    <nav class="tabbar">
+      <a href="index.html" data-page="home"><span class="ico">🏠</span>首页</a>
+      <a href="search.html" data-page="search"><span class="ico">🔍</span>搜索</a>
+      <a href="publish.html" data-page="publish"><span class="ico">➕</span>发布</a>
+      <a href="my.html" data-page="my"><span class="ico">👤</span>我的</a>
+    </nav>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/my.js"></script>
+</body>
+</html>

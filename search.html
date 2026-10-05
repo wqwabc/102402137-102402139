@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>搜索 - 校园失物招领</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="searchbar" style="margin-top:16px;">
+      <div class="box">
+        <span class="icon">🔍</span>
+        <input id="kw" type="text" placeholder="输入物品名称关键词">
+        <button class="go" id="go">搜索</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab active" data-type="all">全部</div>
+      <div class="tab" data-type="lost">寻物</div>
+      <div class="tab" data-type="found">招领</div>
+      <span class="count" id="count"></span>
+    </div>
+
+    <div style="padding:0 18px;">
+      <div style="font-size:13px;font-weight:700;margin:6px 0 8px;">🔥 热门搜索</div>
+      <div class="chips" id="hot" style="padding:0;"></div>
+    </div>
+
+    <div class="list" id="list" style="margin-top:8px;"></div>
+
+    <nav class="tabbar">
+      <a href="index.html" data-page="home"><span class="ico">🏠</span>首页</a>
+      <a href="search.html" data-page="search"><span class="ico">🔍</span>搜索</a>
+      <a href="publish.html" data-page="publish"><span class="ico">➕</span>发布</a>
+      <a href="my.html" data-page="my"><span class="ico">👤</span>我的</a>
+    </nav>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/search.js"></script>
+</body>
+</html>

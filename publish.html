@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>发布信息 - 校园失物招领</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <a class="back" href="index.html">‹</a>
+      <h1>发布信息</h1>
+    </div>
+
+    <!-- 发布表单 -->
+    <div id="formView">
+      <div class="section" style="margin-top:6px;">
+        <h3>信息类型</h3>
+        <div class="type-pick">
+          <button type="button" class="type-opt" data-type="lost">
+            <div class="t">📍 寻物启事</div>
+            <div class="s">我丢了东西，请同学留意</div>
+          </button>
+          <button type="button" class="type-opt" data-type="found">
+            <div class="t">🤲 失物招领</div>
+            <div class="s">我捡到东西，寻找失主</div>
+          </button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="error-box" id="errBox"><ul></ul></div>
+        <div class="form-group">
+          <label>物品名称 <span class="req">*</span></label>
+          <input type="text" id="f_title" placeholder="例如：黑色保温杯、校园一卡通" maxlength="30">
+        </div>
+        <div class="form-group">
+          <label>物品分类</label>
+          <div class="cat-pick" id="f_cat"></div>
+        </div>
+        <div class="form-group">
+          <label id="locLabel">丢失地点 <span class="req">*</span></label>
+          <input type="text" id="f_location" placeholder="例如：图书馆三楼自习区" maxlength="50">
+        </div>
+        <div class="form-group">
+          <label>发生时间</label>
+          <div style="display:flex;gap:10px;">
+            <input type="date" id="f_date" style="flex:1;">
+            <input type="time" id="f_time" style="flex:1;">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>详细描述 <span style="font-weight:400;color:var(--text-2);font-size:12px;">（选填，0/200）</span></label>
+          <textarea id="f_desc" maxlength="200" placeholder="描述物品的颜色、特征、内含物等，便于同学快速辨认"></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>联系方式</h3>
+        <div class="form-group">
+          <label>联系人称呼 <span class="req">*</span></label>
+          <input type="text" id="f_name" placeholder="例如：张同学 / 李思远">
+        </div>
+        <div class="form-group">
+          <label>手机号码</label>
+          <input type="tel" id="f_phone" placeholder="11位手机号" maxlength="11">
+        </div>
+        <div class="form-group">
+          <label>QQ（选填）</label>
+          <input type="text" id="f_qq" placeholder="选填" maxlength="12">
+        </div>
+        <div class="form-group">
+          <label>微信（选填）</label>
+          <input type="text" id="f_wechat" placeholder="选填">
+        </div>
+        <div class="form-group">
+          <label>发布者标识 <span class="req">*</span></label>
+          <input type="text" id="f_publisher" placeholder="填写你的学号/昵称，用于在“我的发布”中管理这条信息">
+          <div class="hint">本系统不做实名认证，仅用它区分“谁发的这条信息”。</div>
+        </div>
+      </div>
+
+      <button class="btn" id="submitBtn">立即发布</button>
+    </div>
+
+    <!-- 发布成功 -->
+    <div id="successView" style="display:none;">
+      <div class="success-wrap">
+        <div class="success-circle">✓</div>
+        <h2 style="margin-top:14px;font-size:20px;">发布成功</h2>
+        <p style="color:var(--text-2);font-size:13px;margin-top:6px;">信息已同步到首页列表，同学们可以搜索到它</p>
+      </div>
+      <div class="section" id="successSummary"></div>
+      <div class="section" style="background:#eaf1ff;color:var(--primary-dark);font-size:13px;">
+        💡 物品归还/找回后，可在「我的发布」中将该条信息标记为已解决，减少对其他同学的打扰。
+      </div>
+      <a class="btn" id="viewDetail">查看信息详情</a>
+      <a class="btn ghost" href="index.html">返回首页</a>
+      <button class="btn ghost" id="againBtn">再发一条</button>
+    </div>
+
+    <nav class="tabbar">
+      <a href="index.html" data-page="home"><span class="ico">🏠</span>首页</a>
+      <a href="search.html" data-page="search"><span class="ico">🔍</span>搜索</a>
+      <a href="publish.html" data-page="publish"><span class="ico">➕</span>发布</a>
+      <a href="my.html" data-page="my"><span class="ico">👤</span>我的</a>
+    </nav>
+  </div>
+
+  <script src="js/store.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/publish.js"></script>
+</body>
+</html>
