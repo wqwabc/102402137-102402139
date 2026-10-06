@@ -147,6 +147,25 @@
       }).join('');
     document.getElementById('viewDetail').setAttribute('href',
       'detail.html?id=' + encodeURIComponent(it.id) + (wasEdit ? '&from=my' : ''));
+
+    // 智能配对：找相反类型、同分类、标题相似的在途信息
+    var matchBox = document.getElementById('matchBox');
+    var matches = Store.findMatches(it);
+    if (matches.length) {
+      var noun = it.type === 'lost' ? '招领' : '寻物';
+      matchBox.innerHTML =
+        '<div class="match-tip">💡 发布成功！系统发现 <b>' + matches.length + '</b> 条可能和你相关的' + noun + '，先看看是不是你要找的：</div>' +
+        matches.map(function (m) {
+          return '<a class="match-item" href="detail.html?id=' + encodeURIComponent(m.id) + '">' +
+            App.typeBadge(m) +
+            '<span class="mt-title">' + App.escapeHtml(m.title) + '</span>' +
+            '<span class="go">查看›</span></a>';
+        }).join('');
+      matchBox.style.display = 'block';
+    } else {
+      matchBox.style.display = 'none';
+    }
+
     window.scrollTo(0, 0);
   });
 

@@ -275,6 +275,28 @@
     });
   }
 
+  // 标题是否有 2 字片段重合（中文按二元组粗匹配）
+  function titleOverlap(a, b) {
+    a = (a || '').toLowerCase(); b = (b || '').toLowerCase();
+    for (var i = 0; i < a.length - 1; i++) {
+      var g = a.substr(i, 2);
+      if (b.indexOf(g) >= 0) return true;
+    }
+    return false;
+  }
+
+  // 智能配对：找相反类型、同分类、标题相似的在途信息
+  // 寻物 -> 推荐可能相关的招领；招领 -> 推荐可能相关的寻物
+  function findMatches(newItem) {
+    var opposite = newItem.type === 'lost' ? 'found' : 'lost';
+    return query({ type: opposite }).filter(function (it) {
+      if (it.id === newItem.id) return false;
+      if (it.status !== 'active') return false;
+      if (it.category !== newItem.category) return false;
+      return titleOverlap(newItem.title, it.title);
+    }).slice(0, 3);
+  }
+
   // 首页顶部统计：今日新增、本周成功归还
   function getStats() {
     var items = getAll();
@@ -332,6 +354,7 @@
     incrViews: incrViews,
     query: query,
     getByPublisher: getByPublisher,
+    findMatches: findMatches,
     getStats: getStats,
     getProfile: getProfile,
     saveProfile: saveProfile,
