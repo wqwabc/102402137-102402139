@@ -4,6 +4,7 @@
   App.setActiveNav('publish');
 
   var state = { type: App.qs('type') === 'found' ? 'found' : 'lost', category: '' };
+  var editId = App.qs('edit') || '';   // 有 ?edit=<id> 即为编辑模式
 
   // 初始化信息类型选中（来自 URL ?type=）
   function syncType() {
@@ -119,13 +120,19 @@
       photo: pendingPhoto,
       icon: chosenIcon
     };
-    var res = Store.add(raw);
+    var wasEdit = !!editId;
+    var res = wasEdit ? Store.updateItem(editId, raw) : Store.add(raw);
     if (!res.ok) { showErrors(res.errors); return; }
+    editId = '';   // 保存后回到“新增”模式
 
     // 发布成功：切换到成功页
     var it = res.item;
     document.getElementById('formView').style.display = 'none';
     document.getElementById('successView').style.display = 'block';
+    document.querySelector('#successView h2').textContent = wasEdit ? '修改已保存' : '发布成功';
+    document.querySelector('#successView p').textContent = wasEdit
+      ? '你的信息已更新'
+      : '信息已同步到首页列表，同学们可以搜索到它';
     var rows = [
       ['信息类型', it.type === 'lost' ? '寻物启事' : '失物招领'],
       ['物品名称', it.title],
@@ -138,7 +145,8 @@
       '<h3>本次发布</h3>' + rows.map(function (r) {
         return '<div class="row"><span class="k">' + r[0] + '</span><span class="v">' + App.escapeHtml(r[1]) + '</span></div>';
       }).join('');
-    document.getElementById('viewDetail').setAttribute('href', 'detail.html?id=' + encodeURIComponent(it.id));
+    document.getElementById('viewDetail').setAttribute('href',
+      'detail.html?id=' + encodeURIComponent(it.id) + (wasEdit ? '&from=my' : ''));
     window.scrollTo(0, 0);
   });
 
@@ -172,6 +180,41 @@
     if (prof.wechat) document.getElementById('f_wechat').value = prof.wechat;
     if (prof.qq) document.getElementById('f_qq').value = prof.qq;
   })();
+
+  // 编辑模式：把已有信息填进表单
+  function loadEditItem() {
+    var it = Store.getById(editId);
+    if (!it) { App.toast('找不到要编辑的信息'); return; }
+    state.type = it.type;
+    state.category = it.category;
+    document.getElementById('f_title').value = it.title;
+    document.getElementById('f_location').value = it.location;
+    var parts = (it.time && it.time.indexOf('-') === 0) ? it.time.split(' ') : ['', ''];
+    document.getElementById('f_date').value = parts[0] || '';
+    document.getElementById('f_time').value = parts[1] || '';
+    document.getElementById('f_desc').value = it.description || '';
+    document.getElementById('f_name').value = it.contactName || '';
+    document.getElementById('f_phone').value = it.contactPhone || '';
+    document.getElementById('f_qq').value = it.contactQq || '';
+    document.getElementById('f_wechat').value = it.contactWechat || '';
+    catBox.querySelectorAll('.cat-chip').forEach(function (c) {
+      c.classList.toggle('active', c.getAttribute('data-c') === it.category);
+    });
+    chosenIcon = it.icon || '';
+    renderIconPicker();
+    pendingPhoto = it.photo || '';
+    if (pendingPhoto) {
+      document.getElementById('previewImg').src = pendingPhoto;
+      document.getElementById('photoPreview').style.display = 'block';
+      document.getElementById('photoPlaceholder').style.display = 'none';
+    }
+    document.querySelector('.topbar h1').textContent = '编辑信息';
+    document.getElementById('submitBtn').textContent = '保存修改';
+    // 编辑时“返回”回到该信息详情，详情页再带 from=my 回到“我的”
+    document.querySelector('.topbar .back').setAttribute('href',
+      'detail.html?id=' + encodeURIComponent(editId) + '&from=my');
+  }
+  if (editId) loadEditItem();
 
   syncType();
 })();

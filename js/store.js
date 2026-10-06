@@ -176,6 +176,29 @@
     return { ok: true, errors: [], item: res.item };
   }
 
+  // 编辑已发布信息：复用同一套校验，保留 id/编号/发布者/时间/状态，更新可改字段
+  function updateItem(id, raw) {
+    var res = validate(raw);
+    if (!res.ok) return res;
+    var items = getAll();
+    var it = null;
+    for (var i = 0; i < items.length; i++) if (items[i].id === id) { it = items[i]; break; }
+    if (!it) return { ok: false, errors: ['信息不存在或已被删除'], item: null };
+    it.title = res.item.title;
+    it.category = res.item.category;
+    it.location = res.item.location;
+    it.time = res.item.time;
+    it.description = res.item.description;
+    it.contactName = res.item.contactName;
+    it.contactPhone = res.item.contactPhone;
+    it.contactQq = res.item.contactQq;
+    it.contactWechat = res.item.contactWechat;
+    it.photo = res.item.photo;
+    it.icon = res.item.icon;
+    save(items);
+    return { ok: true, errors: [], item: it };
+  }
+
   function getById(id) {
     var items = getAll();
     for (var i = 0; i < items.length; i++) if (items[i].id === id) return items[i];
@@ -302,6 +325,7 @@
     getAll: getAll,
     validate: validate,
     add: add,
+    updateItem: updateItem,
     getById: getById,
     updateStatus: updateStatus,
     remove: remove,

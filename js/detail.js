@@ -106,6 +106,7 @@
     var ownerBtns = document.getElementById('ownerBtns');
     var doneLabel = item.type === 'lost' ? '标记为已找到' : '标记为已归还';
     ownerBtns.innerHTML =
+      '<a class="btn small" href="publish.html?edit=' + encodeURIComponent(item.id) + '">✏️ 编辑信息</a> ' +
       (resolved
         ? '<button class="btn small" id="reopenBtn">↩ 重新标记为进行中</button>'
         : '<button class="btn small" id="doneBtn">✔ ' + doneLabel + '</button>') +
