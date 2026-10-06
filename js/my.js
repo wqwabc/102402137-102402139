@@ -34,7 +34,7 @@
 
   // 编辑个人信息
   var mask = document.getElementById('editMask');
-  document.getElementById('editBtn').addEventListener('click', function () {
+  function openEditModal() {
     var prof = Store.getProfile();
     chosenAvatar = prof.avatar;
     document.getElementById('pf_name').value = prof.name;
@@ -45,7 +45,8 @@
     document.getElementById('pf_qq').value = prof.qq;
     renderAvatarPicker();
     mask.style.display = 'flex';
-  });
+  }
+  document.getElementById('editBtn').addEventListener('click', openEditModal);
   document.getElementById('pfCancel').addEventListener('click', function () { mask.style.display = 'none'; });
   mask.addEventListener('click', function (e) { if (e.target === mask) mask.style.display = 'none'; });
   document.getElementById('pfSave').addEventListener('click', function () {
@@ -87,6 +88,9 @@
     }
     listEl.innerHTML = items.map(function (it) { return App.cardHtml(it, 'my'); }).join('');
   }
+
+  // 从首页右上角按钮跳入：自动打开编辑弹窗
+  if (App.qs('edit')) openEditModal();
 
   render();
 })();
