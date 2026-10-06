@@ -55,7 +55,7 @@
     var href = 'detail.html?id=' + encodeURIComponent(item.id) +
       (from ? '&from=' + encodeURIComponent(from) : '');
     return '' +
-      '<a class="card" href="' + href + '">' +
+      '<a class="card' + (item.status === 'resolved' ? ' resolved' : '') + '" href="' + href + '">' +
         '<div class="card-icon cat-' + escapeHtml(item.category) + '">' +
           (item.photo ? '<img class="cat-img" src="' + item.photo + '" alt="物品照片">' : (item.icon || catIcon(item.category))) +
         '</div>' +

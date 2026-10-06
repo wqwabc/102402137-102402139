@@ -234,7 +234,13 @@
       }
       out.push(it);
     }
-    out.sort(function (a, b) { return b.createdAt - a.createdAt; });
+    // 排序：处理中的排前面，已找到/已归还的沉底；同一状态内按发布时间倒序
+    out.sort(function (a, b) {
+      var ra = a.status === 'resolved' ? 1 : 0;
+      var rb = b.status === 'resolved' ? 1 : 0;
+      if (ra !== rb) return ra - rb;
+      return b.createdAt - a.createdAt;
+    });
     return out;
   }
 

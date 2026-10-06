@@ -123,6 +123,9 @@ input, textarea, select { font-family: inherit; font-size: 15px; }
 }
 .card-meta { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-2); }
 .card .badge { margin-top: 2px; flex-shrink: 0; }
+/* 已找到/已归还：灰化并沉底（排序在 store.query 里处理） */
+.card.resolved { opacity: .55; }
+.card.resolved .card-title, .card.resolved .card-desc { color: #9ca3af; }
 
 /* ===== 徽标 ===== */
 .badge { font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
