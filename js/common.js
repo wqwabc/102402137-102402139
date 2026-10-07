@@ -66,6 +66,14 @@
   };
   function catIcon(cat) { return CAT_ICON[cat] || '📦'; }
 
+  // 头像渲染：上传的图片(dataURL)显示为圆形裁剪图，否则按 emoji 文本显示
+  function avatarHtml(a) {
+    if (a && a.indexOf('data:image') === 0) {
+      return '<img src="' + a + '" alt="头像" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+    }
+    return escapeHtml(a || '我');
+  }
+
   // 渲染一条物品卡片（首页/搜索/我的列表通用）
   // from: 可选来源标记（'my' / 'search'），详情页据此决定“返回”跳回哪里
   // keyword: 可选搜索关键词，命中时高亮显示
@@ -152,6 +160,7 @@
     statusClass: statusClass,
     typeBadge: typeBadge,
     catIcon: catIcon,
+    avatarHtml: avatarHtml,
     cardHtml: cardHtml,
     moreHtml: moreHtml,
     copyText: copyText,

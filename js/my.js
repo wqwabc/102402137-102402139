@@ -14,7 +14,7 @@
     var prof = Store.getProfile();
     document.getElementById('pName').textContent = prof.name;
     document.getElementById('pCollege').textContent = prof.college + ' · ' + prof.campus;
-    document.getElementById('pAvatar').textContent = prof.avatar;
+    document.getElementById('pAvatar').innerHTML = App.avatarHtml(prof.avatar);
   }
   renderProfile();
 
@@ -28,9 +28,46 @@
         chosenAvatar = el.getAttribute('data-a');
         box.querySelectorAll('.av').forEach(function (x) { x.classList.remove('active'); });
         el.classList.add('active');
+        refreshAvatarPreview();
       });
     });
   }
+
+  // 上传头像：居中裁剪成 120px 方图，存 base64
+  var avatarFile = document.getElementById('pfAvatarFile');
+  var avatarUpload = document.getElementById('pfAvatarUpload');
+  var avatarPreview = document.getElementById('pfAvatarPreview');
+  var avatarHint = document.getElementById('pfAvatarHint');
+  function refreshAvatarPreview() {
+    if (chosenAvatar && chosenAvatar.indexOf('data:image') === 0) {
+      avatarPreview.innerHTML = '<img src="' + chosenAvatar + '" alt="">';
+      avatarPreview.style.display = 'flex';
+      avatarHint.style.display = 'none';
+    } else {
+      avatarPreview.style.display = 'none';
+      avatarHint.style.display = '';
+    }
+  }
+  avatarUpload.addEventListener('click', function () { avatarFile.click(); });
+  avatarFile.addEventListener('change', function () {
+    var file = avatarFile.files && avatarFile.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var img = new Image();
+      img.onload = function () {
+        var S = 120, side = Math.min(img.width, img.height);
+        var c = document.createElement('canvas');
+        c.width = S; c.height = S;
+        c.getContext('2d').drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, S, S);
+        chosenAvatar = c.toDataURL('image/jpeg', 0.8);
+        refreshAvatarPreview();
+        document.querySelectorAll('#pf_avatar .av').forEach(function (x) { x.classList.remove('active'); });
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsText(file);
+  });
 
   // 编辑个人信息
   var mask = document.getElementById('editMask');
@@ -44,6 +81,7 @@
     document.getElementById('pf_wechat').value = prof.wechat;
     document.getElementById('pf_qq').value = prof.qq;
     renderAvatarPicker();
+    refreshAvatarPreview();
     mask.style.display = 'flex';
   }
   document.getElementById('editBtn').addEventListener('click', openEditModal);
@@ -89,49 +127,6 @@
     }
     listEl.innerHTML = items.map(function (it) { return App.cardHtml(it, 'my'); }).join('');
   }
-
-  // ---------- 数据管理：导出 / 导入 / 恢复演示数据 ----------
-  document.getElementById('exportBtn').addEventListener('click', function () {
-    var data = Store.exportData();
-    var name = 'lost-found-backup-' + new Date().toISOString().slice(0, 10) + '.json';
-    try {
-      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url; a.download = name;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
-      App.toast('已导出 ' + data.items.length + ' 条信息');
-    } catch (e) {
-      App.toast('导出失败：' + e.message);
-    }
-  });
-
-  document.getElementById('importBtn').addEventListener('click', function () {
-    document.getElementById('importFile').click();
-  });
-
-  document.getElementById('importFile').addEventListener('change', function () {
-    var file = this.files && this.files[0];
-    if (!file) return;
-    var reader = new FileReader();
-    reader.onload = function (ev) {
-      var res = Store.importData(String(ev.target.result));
-      if (!res.ok) { App.toast(res.errors[0] || '导入失败'); return; }
-      App.toast('已导入 ' + res.count + ' 条信息');
-      setTimeout(function () { location.reload(); }, 800);
-    };
-    reader.readAsText(file);
-  });
-
-  document.getElementById('resetBtn').addEventListener('click', function () {
-    if (!confirm('恢复演示数据会清空当前所有信息和草稿，确定继续吗？')) return;
-    Store.resetAll();
-    App.toast('已恢复演示数据');
-    setTimeout(function () { location.reload(); }, 700);
-  });
 
   // 从首页右上角按钮跳入：自动打开编辑弹窗
   if (App.qs('edit')) openEditModal();

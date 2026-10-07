@@ -3,6 +3,16 @@
   'use strict';
   App.setActiveNav('home');
 
+  // 右上角圆球：若上传了头像则显示头像，否则保持 👤
+  var fab = document.querySelector('.fab-avatar');
+  if (fab) {
+    var prof = Store.getProfile();
+    if (prof.avatar && prof.avatar.indexOf('data:image') === 0) {
+      fab.innerHTML = '<img src="' + prof.avatar + '" alt="我的头像" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+      fab.style.background = '#fff';
+    }
+  }
+
   var PAGE_SIZE = 6;   // 每页条数（“加载更多”每次多显示 6 条）
   var state = {
     type: 'all', category: 'all', location: 'all',

@@ -389,3 +389,87 @@ mark.hl { background: #fff2a8; color: inherit; border-radius: 3px; padding: 0 1p
 
 /* ===== 数据管理按钮组 ===== */
 .tools { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* 上传头像 */
+.avatar-upload {
+  border: 2px dashed #cfd6e4; border-radius: 12px; padding: 14px;
+  text-align: center; cursor: pointer; transition: border-color .15s;
+}
+.avatar-upload:hover { border-color: var(--primary); }
+.avatar-upload .au-preview { width: 64px; height: 64px; margin: 0 auto; border-radius: 50%; overflow: hidden; }
+.avatar-upload .au-preview img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-upload .au-hint { color: var(--text-2); font-size: 13px; }
+
+/* ===== 排版精修 ===== */
+body {
+  font-size: 15px;
+  line-height: 1.6;
+  letter-spacing: .2px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Source Han Sans SC", sans-serif;
+}
+.page-title { letter-spacing: 1px; font-weight: 800; }
+.page-sub { letter-spacing: .3px; }
+h2, h3 { letter-spacing: .3px; }
+.section h3 { font-weight: 700; color: #111827; }
+.card-title { font-weight: 700; letter-spacing: .2px; }
+.card-desc { line-height: 1.5; }
+.row .v { letter-spacing: .2px; }
+.btn { letter-spacing: .5px; }
+.badge { letter-spacing: .5px; }
+.tabbar a { letter-spacing: .3px; }
+input, textarea, select { letter-spacing: .2px; }
+
+/* 主标题：文艺楷体风 */
+.page-title {
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", "BiauKai", serif;
+  font-size: 29px;
+  font-weight: 700;
+  letter-spacing: 5px;
+}
+
+/* 其他标题统一文艺楷体风（正文/按钮保持黑体易读） */
+.topbar h1,
+.section h3,
+.detail-hero h2,
+.profile .n,
+.myhead h3,
+.cta .t {
+  font-family: "Kaiti SC", "STKaiti", "KaiTi", "楷体", "BiauKai", serif;
+  letter-spacing: 1px;
+}
+.detail-hero h2 { letter-spacing: 1.5px; }
+
+/* 底部中间“发布”：凸起边框圆钮，突出 */
+.tabbar a[data-page="publish"] {
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 12px;
+}
+.tabbar a[data-page="publish"] .ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: #fff; border: 2px solid var(--primary);
+  font-size: 24px; margin-top: -20px;
+  box-shadow: 0 6px 16px rgba(47,107,255,.30);
+}
+
+/* 修正：发布文字在圆形按钮下方 */
+.tabbar a[data-page="publish"] .ico {
+  display: flex; align-items: center; justify-content: center;
+  margin: -20px auto 2px;
+}
+
+/* “我的发布”标题回到原黑体 */
+.myhead h3 {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Microsoft YaHei", sans-serif;
+  letter-spacing: .2px;
+}
+
+/* 卡片英文小字：斜体衬线，文艺风 */
+.cta .s {
+  font-family: Georgia, "Times New Roman", "Songti SC", serif;
+  font-style: italic;
+  letter-spacing: .5px;
+}
