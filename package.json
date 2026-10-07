@@ -1,0 +1,16 @@
+{
+  "name": "campus-lost-found",
+  "version": "1.1.0",
+  "private": true,
+  "description": "校园失物招领（纯静态 Web，打开 index.html 即可运行；含零依赖单元测试）",
+  "scripts": {
+    "test": "node --test test/store.test.js test/common.test.js test/flow.test.js test/pages.test.js test/dom.flow.test.js",
+    "test:all": "node --test \"test/**/*.test.js\"",
+    "test:dom": "node --test test/dom.flow.test.js",
+    "test:watch": "node --test --watch test/store.test.js test/common.test.js test/flow.test.js test/pages.test.js"
+  },
+  "keywords": ["lost-and-found", "vanilla-js", "localStorage", "unit-test"],
+  "engines": {
+    "node": ">=18"
+  }
+}
