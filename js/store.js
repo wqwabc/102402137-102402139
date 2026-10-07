@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  var STORAGE_KEY = 'campus_lost_found_items_v1';
+  var STORAGE_KEY = 'campus_lost_found_items_v2';
   var PROFILE_KEY = 'campus_profile_v1';
   var HISTORY_KEY = 'campus_search_history_v1';
   var DRAFT_KEY = 'campus_publish_draft_v1';
@@ -68,7 +68,8 @@
         location: '图书馆三楼自习区', time: '2026-09-27 09:20',
         description: '杯身贴有图书馆活动标签，杯盖边缘略有磨损，容量约500ml。目前暂存在图书馆三楼值班室，失主可携带学号前来认领。',
         contactName: '李思远', contactPhone: '13800138000', contactQq: '', contactWechat: '',
-        publisher: '102402137', status: 'resolved', createdAt: now - 2 * H, views: 12
+        publisher: '102402137', status: 'resolved', createdAt: now - 2 * H, views: 12,
+        photo: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='320'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23fff1f0'/><stop offset='1' stop-color='%23ffd6d6'/></linearGradient></defs><rect width='100%25' height='100%25' fill='url(%23g)'/><text x='50%25' y='56%25' font-size='110' text-anchor='middle'>🥤</text></svg>"
       },
       {
         id: genId(), code: 'LF2026092702', type: 'lost',
@@ -84,7 +85,8 @@
         location: '体育馆羽毛球区', time: '2026-09-25 21:10',
         description: '耳机盒内侧有手写姓"陈"的贴纸，配套两只白色耳机，对本人很重要，捡到请联系。',
         contactName: '陈同学', contactPhone: '13722223333', contactQq: '', contactWechat: 'chen_wj2024',
-        publisher: '102402138', status: 'active', createdAt: now - 2 * D, views: 15
+        publisher: '102402138', status: 'active', createdAt: now - 2 * D, views: 15,
+        photo: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='320'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23eef4ff'/><stop offset='1' stop-color='%23d3e0ff'/></linearGradient></defs><rect width='100%25' height='100%25' fill='url(%23g)'/><text x='50%25' y='56%25' font-size='110' text-anchor='middle'>🎧</text></svg>"
       },
       {
         id: genId(), code: 'LF2026092504', type: 'found',
@@ -92,7 +94,8 @@
         location: '教学楼A座302', time: '2026-09-25 16:05',
         description: '伞柄有轻微掉漆，伞套已丢失，发现时落在教室后排座位。请失主描述伞柄特征认领。',
         contactName: '王小雨', contactPhone: '13633334444', contactQq: '', contactWechat: '',
-        publisher: '102402137', status: 'active', createdAt: now - 2 * D, views: 5
+        publisher: '102402137', status: 'active', createdAt: now - 2 * D, views: 5,
+        photo: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='480' height='320'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23e8f4ff'/><stop offset='1' stop-color='%23cfe6ff'/></linearGradient></defs><rect width='100%25' height='100%25' fill='url(%23g)'/><text x='50%25' y='56%25' font-size='110' text-anchor='middle'>🌂</text></svg>"
       },
       {
         id: genId(), code: 'LF2026092405', type: 'found',

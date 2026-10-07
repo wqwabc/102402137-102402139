@@ -81,7 +81,7 @@
     var href = 'detail.html?id=' + encodeURIComponent(item.id) +
       (from ? '&from=' + encodeURIComponent(from) : '');
     return '' +
-      '<a class="card' + (item.status === 'resolved' ? ' resolved' : '') + '" href="' + href + '">' +
+      '<a class="card' + (item.status === 'resolved' ? ' resolved' : '') + '" href="' + href + '" data-id="' + escapeHtml(item.id) + '">' +
         '<div class="card-icon cat-' + escapeHtml(item.category) + '">' +
           (item.photo ? '<img class="cat-img" src="' + item.photo + '" alt="物品照片">' : (item.icon || catIcon(item.category))) +
         '</div>' +
@@ -138,6 +138,51 @@
       if (a.getAttribute('data-page') === page) a.classList.add('active');
     });
   }
+
+  // 悬浮预览：鼠标停在卡片上时浮出简介/照片
+  function initCardPreview() {
+    var box = document.getElementById('cardPreview');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'cardPreview';
+      document.body.appendChild(box);
+    }
+    function show(id, x, y) {
+      var it = (typeof Store !== 'undefined' && Store.getById) ? Store.getById(id) : null;
+      if (!it) { box.style.display = 'none'; return; }
+      var photo = it.photo ? '<img class="pv-photo" src="' + it.photo + '" alt="物品照片">' : '';
+      box.innerHTML =
+        photo +
+        '<div class="pv-title">' + typeBadge(it) + ' ' + escapeHtml(it.title) + '</div>' +
+        '<div class="pv-desc">' + escapeHtml(it.description || '（暂无描述）') + '</div>' +
+        '<div class="pv-meta">📍 ' + escapeHtml(it.location || '—') + ' · ' + escapeHtml(it.time || '') + '</div>';
+      box.style.display = 'block';
+      move(x, y);
+    }
+    function move(x, y) {
+      var w = box.offsetWidth, h = box.offsetHeight;
+      var left = x - w / 2;
+      var top = y - h - 16;            // 浮在鼠标上方
+      if (left < 8) left = 8;
+      if (left + w > window.innerWidth - 8) left = window.innerWidth - w - 8;
+      if (top < 8) top = y + 16;       // 上方空间不够就改到下方
+      box.style.left = left + 'px';
+      box.style.top = top + 'px';
+    }
+    document.addEventListener('mouseover', function (e) {
+      var card = e.target.closest('.card');
+      if (!card) return;
+      show(card.getAttribute('data-id'), e.clientX, e.clientY);
+    });
+    document.addEventListener('mousemove', function (e) {
+      if (box.style.display === 'block') move(e.clientX, e.clientY);
+    });
+    document.addEventListener('mouseout', function (e) {
+      var card = e.target.closest('.card');
+      if (card && !card.contains(e.relatedTarget)) box.style.display = 'none';
+    });
+  }
+  initCardPreview();
 
   function qs(name) {
     var m = new RegExp('[?&]' + name + '=([^&]*)').exec(location.search);
