@@ -75,9 +75,10 @@
 
   function render() {
     var all = Store.getByPublisher(who);
-    var done = all.filter(function (it) { return it.status === 'resolved'; }).length;
-    document.getElementById('stTotal').textContent = all.length;
-    document.getElementById('stDone').textContent = done;
+    var sum = Store.summarize(all);
+    document.getElementById('stTotal').textContent = sum.total;
+    document.getElementById('stDone').textContent = sum.resolved;
+    document.getElementById('stViews').textContent = sum.views;
 
     var items = all.filter(function (it) { return tab === 'all' || it.type === tab; });
     document.getElementById('count').textContent = '共 ' + items.length + ' 条';
@@ -88,6 +89,49 @@
     }
     listEl.innerHTML = items.map(function (it) { return App.cardHtml(it, 'my'); }).join('');
   }
+
+  // ---------- 数据管理：导出 / 导入 / 恢复演示数据 ----------
+  document.getElementById('exportBtn').addEventListener('click', function () {
+    var data = Store.exportData();
+    var name = 'lost-found-backup-' + new Date().toISOString().slice(0, 10) + '.json';
+    try {
+      var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url; a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      App.toast('已导出 ' + data.items.length + ' 条信息');
+    } catch (e) {
+      App.toast('导出失败：' + e.message);
+    }
+  });
+
+  document.getElementById('importBtn').addEventListener('click', function () {
+    document.getElementById('importFile').click();
+  });
+
+  document.getElementById('importFile').addEventListener('change', function () {
+    var file = this.files && this.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function (ev) {
+      var res = Store.importData(String(ev.target.result));
+      if (!res.ok) { App.toast(res.errors[0] || '导入失败'); return; }
+      App.toast('已导入 ' + res.count + ' 条信息');
+      setTimeout(function () { location.reload(); }, 800);
+    };
+    reader.readAsText(file);
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function () {
+    if (!confirm('恢复演示数据会清空当前所有信息和草稿，确定继续吗？')) return;
+    Store.resetAll();
+    App.toast('已恢复演示数据');
+    setTimeout(function () { location.reload(); }, 700);
+  });
 
   // 从首页右上角按钮跳入：自动打开编辑弹窗
   if (App.qs('edit')) openEditModal();

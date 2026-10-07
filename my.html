@@ -23,6 +23,7 @@
       <div class="stats-row">
         <div class="cell"><div class="num" id="stTotal">0</div><div class="lab">我的发布</div></div>
         <div class="cell"><div class="num" id="stDone">0</div><div class="lab">已完成</div></div>
+        <div class="cell"><div class="num" id="stViews">0</div><div class="lab">总浏览</div></div>
       </div>
     </div>
 
@@ -62,6 +63,20 @@
         <span class="count" id="count"></span>
       </div>
       <div class="list" id="myList"></div>
+    </div>
+
+    <!-- 数据管理：导出 / 导入备份、恢复演示数据 -->
+    <div class="section">
+      <h3>💾 数据管理</h3>
+      <div class="hint" style="margin-bottom:10px;">
+        所有信息保存在本机浏览器（localStorage）里。换电脑、清缓存或给别人演示前，可以先导出备份；导入时会覆盖当前数据。
+      </div>
+      <div class="tools">
+        <button type="button" class="btn ghost small" id="exportBtn">⬇️ 导出备份</button>
+        <button type="button" class="btn ghost small" id="importBtn">⬆️ 导入备份</button>
+        <button type="button" class="btn ghost small danger" id="resetBtn">♻️ 恢复演示数据</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
     </div>
 
     <nav class="tabbar">
