@@ -8,11 +8,19 @@
 
   var STORAGE_KEY = 'campus_lost_found_items_v1';
   var PROFILE_KEY = 'campus_profile_v1';
+  var HISTORY_KEY = 'campus_search_history_v1';
+  var DRAFT_KEY = 'campus_publish_draft_v1';
+  var HISTORY_MAX = 8;      // 搜索历史最多保留条数
+  var DATA_VERSION = 1;     // 备份文件的数据版本号
 
   // 物品分类（下拉/胶囊按钮的固定取值，便于筛选与白盒测试）
   var CATEGORIES = ['证件卡', '数码电子', '生活用品', '雨具', '包袋', '随身物品', '图书资料', '其他'];
   // 信息类型：lost=寻物启事（我丢了东西），found=失物招领（我捡到东西）
   var TYPES = { lost: '寻物', found: '招领' };
+  // 校园里最常丢东西的地点，做成一键筛选（按地点关键字模糊匹配）
+  var HOT_LOCATIONS = ['图书馆', '食堂', '教学楼', '体育馆', '宿舍', '校车站', '实验楼', '操场'];
+  // 列表排序方式
+  var SORTS = ['newest', 'views', 'oldest'];
 
   // 当前登录用户：雏形阶段默认已登录，固定为本机同学的学号。
   // 发布时自动署名，不再让用户手动填写“发布者标识”。
@@ -238,8 +246,9 @@
     }
   }
 
-  // 组合查询：keyword / type / category / location / status
-  // opt: { keyword, type, category, location, status }
+  // 组合查询：keyword / type / category / location / status / sort
+  // opt: { keyword, type, category, location, status, sort }
+  // sort: newest(默认，最新发布) | views(浏览最多) | oldest(最早发布)
   function query(opt) {
     opt = opt || {};
     var kw = (opt.keyword || '').trim().toLowerCase();
@@ -257,14 +266,51 @@
       }
       out.push(it);
     }
-    // 排序：处理中的排前面，已找到/已归还的沉底；同一状态内按发布时间倒序
+    // 排序：处理中的排前面，已找到/已归还的沉底；同一状态内按所选规则排序
+    var sort = SORTS.indexOf(opt.sort) === -1 ? 'newest' : opt.sort;
     out.sort(function (a, b) {
       var ra = a.status === 'resolved' ? 1 : 0;
       var rb = b.status === 'resolved' ? 1 : 0;
       if (ra !== rb) return ra - rb;
+      if (sort === 'views') return (b.views || 0) - (a.views || 0);
+      if (sort === 'oldest') return a.createdAt - b.createdAt;
       return b.createdAt - a.createdAt;
     });
     return out;
+  }
+
+  // 分页：返回“前 page*size 条”（用于首页/搜索页的「加载更多」）
+  // 返回 { items, total, loaded, page, size, hasMore }
+  function paginate(list, page, size) {
+    var arr = Array.isArray(list) ? list : [];
+    var p = parseInt(page, 10); if (!(p >= 1)) p = 1;
+    var s = parseInt(size, 10); if (!(s >= 1)) s = 10;
+    var loaded = Math.min(arr.length, p * s);
+    return {
+      items: arr.slice(0, loaded),
+      total: arr.length,
+      loaded: loaded,
+      page: p,
+      size: s,
+      hasMore: loaded < arr.length
+    };
+  }
+
+  // 汇总一组信息：总数 / 已完成 / 进行中 / 总浏览 / 完成率(%)
+  function summarize(list) {
+    var arr = Array.isArray(list) ? list : [];
+    var resolved = 0, views = 0;
+    for (var i = 0; i < arr.length; i++) {
+      if (arr[i].status === 'resolved') resolved++;
+      views += (arr[i].views || 0);
+    }
+    return {
+      total: arr.length,
+      resolved: resolved,
+      active: arr.length - resolved,
+      views: views,
+      rate: arr.length ? Math.round(resolved * 100 / arr.length) : 0
+    };
   }
 
   function getByPublisher(name) {
@@ -314,6 +360,140 @@
 
   function _reset() { save(seed()); }
 
+  // ---------- 搜索历史（搜索页展示，最近 8 条，重复关键词自动置顶） ----------
+  function getSearchHistory() {
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(HISTORY_KEY) : null;
+      var arr = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(arr)) return [];
+      return arr.filter(function (x) { return typeof x === 'string' && x.trim(); }).slice(0, HISTORY_MAX);
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function _saveHistory(arr) {
+    if (global.localStorage) global.localStorage.setItem(HISTORY_KEY, JSON.stringify(arr.slice(0, HISTORY_MAX)));
+  }
+
+  function addSearchHistory(keyword) {
+    var kw = (keyword || '').trim();
+    if (!kw) return getSearchHistory();
+    var list = getSearchHistory().filter(function (x) { return x.toLowerCase() !== kw.toLowerCase(); });
+    list.unshift(kw);
+    list = list.slice(0, HISTORY_MAX);
+    _saveHistory(list);
+    return list;
+  }
+
+  function removeSearchHistory(keyword) {
+    var list = getSearchHistory().filter(function (x) { return x !== keyword; });
+    _saveHistory(list);
+    return list;
+  }
+
+  function clearSearchHistory() {
+    _saveHistory([]);
+    return [];
+  }
+
+  // ---------- 发布草稿（表单自动保存，防止误关页面丢内容；照片不入草稿） ----------
+  function getDraft() {
+    try {
+      var raw = global.localStorage ? global.localStorage.getItem(DRAFT_KEY) : null;
+      if (!raw) return null;
+      var d = JSON.parse(raw);
+      if (!d || typeof d !== 'object' || !d.form || typeof d.form !== 'object') return null;
+      return { form: d.form, savedAt: d.savedAt || 0 };
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function saveDraft(draft) {
+    if (!global.localStorage) return null;
+    var d = { form: (draft && draft.form) || {}, savedAt: Date.now() };
+    global.localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+    return d;
+  }
+
+  function clearDraft() {
+    if (global.localStorage) global.localStorage.removeItem(DRAFT_KEY);
+    return null;
+  }
+
+  // ---------- 数据备份：导出 / 导入 / 恢复演示数据 ----------
+  function exportData() {
+    return {
+      app: 'campus-lost-found',
+      version: DATA_VERSION,
+      exportedAt: new Date().toISOString(),
+      items: getAll(),
+      profile: getProfile()
+    };
+  }
+
+  // 导入时对每条记录做最小校验与字段兜底，坏数据直接跳过
+  function _normalizeImport(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    var title = String(raw.title || '').trim();
+    if (!title) return null;
+    if (raw.type !== 'lost' && raw.type !== 'found') return null;
+    var category = CATEGORIES.indexOf(raw.category) >= 0 ? raw.category : '其他';
+    return {
+      id: (typeof raw.id === 'string' && raw.id) ? raw.id : genId(),
+      code: String(raw.code || genCode()),
+      type: raw.type,
+      title: title,
+      category: category,
+      location: String(raw.location || '未填写'),
+      time: String(raw.time || '时间未填'),
+      description: String(raw.description || '').slice(0, 500),
+      contactName: String(raw.contactName || '匿名同学'),
+      contactPhone: String(raw.contactPhone || ''),
+      contactQq: String(raw.contactQq || ''),
+      contactWechat: String(raw.contactWechat || ''),
+      photo: typeof raw.photo === 'string' ? raw.photo : '',
+      icon: typeof raw.icon === 'string' ? raw.icon : '',
+      publisher: String(raw.publisher || CURRENT_USER_ID),
+      status: raw.status === 'resolved' ? 'resolved' : 'active',
+      createdAt: Number(raw.createdAt) || Date.now(),
+      views: Number(raw.views) || 0
+    };
+  }
+
+  // 接受 JSON 字符串或对象；成功时整体替换本地数据
+  function importData(input) {
+    var data = input;
+    if (typeof input === 'string') {
+      try {
+        data = JSON.parse(input);
+      } catch (e) {
+        return { ok: false, errors: ['不是合法的 JSON 文件'], count: 0 };
+      }
+    }
+    if (!data || typeof data !== 'object' || !Array.isArray(data.items)) {
+      return { ok: false, errors: ['数据格式不正确：缺少 items 列表'], count: 0 };
+    }
+    var items = [];
+    for (var i = 0; i < data.items.length; i++) {
+      var it = _normalizeImport(data.items[i]);
+      if (it) items.push(it);
+    }
+    if (!items.length) return { ok: false, errors: ['没有解析到任何有效信息'], count: 0 };
+    save(items);
+    if (data.profile && typeof data.profile === 'object') saveProfile(data.profile);
+    return { ok: true, errors: [], count: items.length };
+  }
+
+  // 一键恢复演示数据（同时清掉草稿与搜索历史）
+  function resetAll() {
+    _reset();
+    clearSearchHistory();
+    clearDraft();
+    return getAll();
+  }
+
   // ---------- 个人信息（昵称 / 学院，可在“我的”页编辑） ----------
   function getProfile() {
     var def = {
@@ -343,6 +523,9 @@
   var Store = {
     CATEGORIES: CATEGORIES,
     TYPES: TYPES,
+    HOT_LOCATIONS: HOT_LOCATIONS,
+    SORTS: SORTS,
+    HISTORY_MAX: HISTORY_MAX,
     CURRENT_USER_ID: CURRENT_USER_ID,
     getAll: getAll,
     validate: validate,
@@ -353,11 +536,23 @@
     remove: remove,
     incrViews: incrViews,
     query: query,
+    paginate: paginate,
+    summarize: summarize,
     getByPublisher: getByPublisher,
     findMatches: findMatches,
     getStats: getStats,
     getProfile: getProfile,
     saveProfile: saveProfile,
+    getSearchHistory: getSearchHistory,
+    addSearchHistory: addSearchHistory,
+    removeSearchHistory: removeSearchHistory,
+    clearSearchHistory: clearSearchHistory,
+    getDraft: getDraft,
+    saveDraft: saveDraft,
+    clearDraft: clearDraft,
+    exportData: exportData,
+    importData: importData,
+    resetAll: resetAll,
     genCode: genCode,
     _seed: seed,
     _reset: _reset

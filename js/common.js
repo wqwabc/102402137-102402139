@@ -13,6 +13,23 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
+  // 关键词高亮：先转义再包 <mark>，大小写不敏感、支持一处文本多次命中
+  // 返回的仍是安全的 HTML 片段（所有原文片段都经过 escapeHtml）
+  function highlight(text, keyword) {
+    var s = (text == null) ? '' : String(text);
+    var kw = (keyword == null) ? '' : String(keyword).trim();
+    if (!kw) return escapeHtml(s);
+    var lower = s.toLowerCase();
+    var target = kw.toLowerCase();
+    var out = '', from = 0, idx;
+    while ((idx = lower.indexOf(target, from)) !== -1) {
+      out += escapeHtml(s.slice(from, idx)) +
+        '<mark class="hl">' + escapeHtml(s.slice(idx, idx + kw.length)) + '</mark>';
+      from = idx + kw.length;
+    }
+    return out + escapeHtml(s.slice(from));
+  }
+
   // 时间友好显示：今天 HH:mm / 昨天 HH:mm / MM-DD HH:mm
   function fmtTime(ts) {
     if (!ts) return '';
@@ -51,7 +68,8 @@
 
   // 渲染一条物品卡片（首页/搜索/我的列表通用）
   // from: 可选来源标记（'my' / 'search'），详情页据此决定“返回”跳回哪里
-  function cardHtml(item, from) {
+  // keyword: 可选搜索关键词，命中时高亮显示
+  function cardHtml(item, from, keyword) {
     var href = 'detail.html?id=' + encodeURIComponent(item.id) +
       (from ? '&from=' + encodeURIComponent(from) : '');
     return '' +
@@ -61,11 +79,11 @@
         '</div>' +
         '<div class="card-body">' +
           '<div class="card-title-row">' + typeBadge(item) +
-            '<span class="card-title">' + escapeHtml(item.title) + '</span>' +
+            '<span class="card-title">' + highlight(item.title, keyword) + '</span>' +
           '</div>' +
-          '<div class="card-desc">' + escapeHtml(item.description || '暂无描述') + '</div>' +
+          '<div class="card-desc">' + highlight(item.description || '暂无描述', keyword) + '</div>' +
           '<div class="card-meta">' +
-            '<span class="loc">📍 ' + escapeHtml(item.location) + '</span>' +
+            '<span class="loc">📍 ' + highlight(item.location, keyword) + '</span>' +
             '<span class="time">' + escapeHtml(fmtTime(item.createdAt)) + '</span>' +
           '</div>' +
         '</div>' +
@@ -118,17 +136,30 @@
     return m ? decodeURIComponent(m[1]) : '';
   }
 
+  // 「加载更多」按钮（p 为 Store.paginate 的返回值；纯字符串，便于单测）
+  function moreHtml(p) {
+    if (!p || !p.total) return '';
+    if (!p.hasMore) return '<div class="list-end">— 已经到底啦 —</div>';
+    return '<button type="button" class="more-btn" id="moreBtn">加载更多（还有 ' +
+      (p.total - p.loaded) + ' 条）</button>';
+  }
+
   global.App = {
     escapeHtml: escapeHtml,
+    highlight: highlight,
     fmtTime: fmtTime,
     statusText: statusText,
     statusClass: statusClass,
     typeBadge: typeBadge,
     catIcon: catIcon,
     cardHtml: cardHtml,
+    moreHtml: moreHtml,
     copyText: copyText,
     toast: toast,
     setActiveNav: setActiveNav,
     qs: qs
   };
-})(window);
+
+  // 浏览器里挂到 window.App；Node 里导出，便于单元测试
+  if (typeof module !== 'undefined' && module.exports) module.exports = App;
+})(typeof globalThis !== 'undefined' ? globalThis : this);

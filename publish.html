@@ -15,6 +15,11 @@
 
     <!-- 发布表单 -->
     <div id="formView">
+      <div class="draft-bar" id="draftBar" style="display:none;">
+        <span id="draftText">检测到上次未发布的草稿</span>
+        <button type="button" class="link" id="draftRestore">恢复</button>
+        <button type="button" class="link" id="draftDiscard">丢弃</button>
+      </div>
       <div class="section" style="margin-top:6px;">
         <h3>信息类型</h3>
         <div class="type-pick">
@@ -95,6 +100,7 @@
         </div>
       </div>
 
+      <div class="hint" id="draftHint" style="text-align:center;"></div>
       <button class="btn" id="submitBtn">立即发布</button>
     </div>
 

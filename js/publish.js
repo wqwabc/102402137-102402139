@@ -103,15 +103,18 @@
     box.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
-  document.getElementById('submitBtn').addEventListener('click', function () {
+  // 把表单里的内容收集成一个对象（发布与“草稿自动保存”共用）
+  function collect() {
     var date = document.getElementById('f_date').value;   // yyyy-mm-dd
     var time = document.getElementById('f_time').value;   // hh:mm
-    var raw = {
+    return {
       type: state.type,
       title: document.getElementById('f_title').value,
       category: state.category,
       location: document.getElementById('f_location').value,
       time: (date && time) ? (date + ' ' + time) : (date || ''),
+      date: date,
+      clock: time,
       description: document.getElementById('f_desc').value,
       contactName: document.getElementById('f_name').value,
       contactPhone: document.getElementById('f_phone').value,
@@ -120,10 +123,83 @@
       photo: pendingPhoto,
       icon: chosenIcon
     };
+  }
+
+  // ---------- 草稿自动保存 ----------
+  // 目的：填了一半不小心关掉页面/刷新，内容不会白填。照片是 base64，体积大，不入草稿。
+  var draftBar = document.getElementById('draftBar');
+  var draftHint = document.getElementById('draftHint');
+  var draftTimer = null;
+
+  function draftHasContent(f) {
+    var texts = [f.title, f.location, f.description, f.contactPhone, f.contactQq, f.contactWechat];
+    for (var i = 0; i < texts.length; i++) if ((texts[i] || '').trim()) return true;
+    return !!f.category;
+  }
+
+  function scheduleDraftSave() {
+    if (editId) return;                     // 编辑已有信息时不写草稿
+    clearTimeout(draftTimer);
+    draftTimer = setTimeout(function () {
+      var f = collect();
+      if (!draftHasContent(f)) { Store.clearDraft(); draftHint.textContent = ''; return; }
+      var d = Store.saveDraft({ form: f });
+      if (d) draftHint.textContent = '草稿已自动保存 · ' + App.fmtTime(d.savedAt);
+    }, 400);
+  }
+
+  document.getElementById('formView').addEventListener('input', scheduleDraftSave);
+  document.getElementById('formView').addEventListener('change', scheduleDraftSave);
+
+  // 打开页面时若存在草稿，先问一句要不要恢复（不直接覆盖空表单）
+  function showDraftBar(draft) {
+    if (!draft) return;
+    document.getElementById('draftText').textContent =
+      '检测到 ' + App.fmtTime(draft.savedAt) + ' 保存的草稿，要恢复吗？';
+    draftBar.style.display = 'flex';
+  }
+
+  function applyDraft(form) {
+    state.type = form.type === 'found' ? 'found' : 'lost';
+    state.category = form.category || '';
+    document.getElementById('f_title').value = form.title || '';
+    document.getElementById('f_location').value = form.location || '';
+    document.getElementById('f_date').value = form.date || '';
+    document.getElementById('f_time').value = form.clock || '';
+    document.getElementById('f_desc').value = form.description || '';
+    document.getElementById('f_name').value = form.contactName || '';
+    document.getElementById('f_phone').value = form.contactPhone || '';
+    document.getElementById('f_qq').value = form.contactQq || '';
+    document.getElementById('f_wechat').value = form.contactWechat || '';
+    chosenIcon = form.icon || '';
+    catBox.querySelectorAll('.cat-chip').forEach(function (c) {
+      c.classList.toggle('active', c.getAttribute('data-c') === state.category);
+    });
+    renderIconPicker();
+    syncType();
+  }
+
+  document.getElementById('draftRestore').addEventListener('click', function () {
+    var d = Store.getDraft();
+    if (d) { applyDraft(d.form); App.toast('草稿已恢复'); }
+    draftBar.style.display = 'none';
+  });
+
+  document.getElementById('draftDiscard').addEventListener('click', function () {
+    Store.clearDraft();
+    draftBar.style.display = 'none';
+    draftHint.textContent = '';
+    App.toast('已丢弃草稿');
+  });
+
+  document.getElementById('submitBtn').addEventListener('click', function () {
+    var raw = collect();
     var wasEdit = !!editId;
     var res = wasEdit ? Store.updateItem(editId, raw) : Store.add(raw);
     if (!res.ok) { showErrors(res.errors); return; }
     editId = '';   // 保存后回到“新增”模式
+    Store.clearDraft();
+    draftHint.textContent = '';
 
     // 发布成功：切换到成功页
     var it = res.item;
@@ -172,7 +248,6 @@
   document.getElementById('againBtn').addEventListener('click', function () {
     document.getElementById('formView').style.display = '';
     document.getElementById('successView').style.display = 'none';
-    document.querySelector('#formView form') || resetForm();
     resetForm();
     window.scrollTo(0, 0);
   });
@@ -234,6 +309,7 @@
       'detail.html?id=' + encodeURIComponent(editId) + '&from=my');
   }
   if (editId) loadEditItem();
+  else showDraftBar(Store.getDraft());
 
   syncType();
 })();
